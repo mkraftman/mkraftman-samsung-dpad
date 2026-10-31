@@ -97,9 +97,25 @@ class MkraftmanSamsungDpad extends HTMLElement {
           opacity: 0.6;
         }
 
+      </style>
+
+      <button class="trigger" id="trigger" aria-label="D-pad">
+        <ha-icon icon="${c.icon}" id="triggerIcon"></ha-icon>
+      </button>
+
+    `;
+
+    // Overlay lives in its own host attached to document.body while open, so no
+    // ancestor (transforms, stacking contexts, sidebar) can clip or cover it.
+    if (this._portal) this._portal.remove();
+    this._portal = document.createElement("div");
+    this._portal.setAttribute("data-mkraftman-samsung-dpad", "");
+    const ps = this._portal.attachShadow({ mode: "open" });
+    ps.innerHTML = `
+      <style>
         /* Scrim - tap anywhere outside the d-pad to close */
         .dpad-scrim {
-          display: none;
+          display: block;
           position: fixed;
           top: 0;
           left: 0;
@@ -108,13 +124,10 @@ class MkraftmanSamsungDpad extends HTMLElement {
           z-index: 9998;
           background: transparent;
         }
-        .dpad-scrim.visible {
-          display: block;
-        }
 
         /* D-pad overlay - drops down from the top */
         .dpad-overlay {
-          display: none;
+          display: block;
           position: fixed;
           top: 0;
           left: 0;
@@ -125,9 +138,6 @@ class MkraftmanSamsungDpad extends HTMLElement {
           padding-top: calc(8px + env(safe-area-inset-top, 0px));
           box-shadow: 0 2px 10px rgba(0,0,0,0.3);
           border-radius: 0 0 24px 24px;
-        }
-        .dpad-overlay.visible {
-          display: block;
         }
         .dpad-grid {
           display: grid;
@@ -167,11 +177,6 @@ class MkraftmanSamsungDpad extends HTMLElement {
           filter: brightness(0) invert(11%);
         }
       </style>
-
-      <button class="trigger" id="trigger" aria-label="D-pad">
-        <ha-icon icon="${c.icon}" id="triggerIcon"></ha-icon>
-      </button>
-
       <div class="dpad-scrim" id="scrim"></div>
       <div class="dpad-overlay" id="overlay">
         <div class="dpad-grid">${keysHtml}</div>
@@ -181,8 +186,8 @@ class MkraftmanSamsungDpad extends HTMLElement {
     const s = this.shadowRoot;
     this._el.trigger = s.getElementById("trigger");
     this._el.triggerIcon = s.getElementById("triggerIcon");
-    this._el.overlay = s.getElementById("overlay");
-    this._el.scrim = s.getElementById("scrim");
+    this._el.overlay = ps.getElementById("overlay");
+    this._el.scrim = ps.getElementById("scrim");
 
     this._el.trigger.addEventListener("click", () => this._open());
     this._el.scrim.addEventListener("click", () => this._close());
@@ -223,14 +228,11 @@ class MkraftmanSamsungDpad extends HTMLElement {
   }
 
   _open() {
-    this._el.overlay.classList.add("visible");
-    this._el.scrim.classList.add("visible");
+    if (this._portal && !this._portal.isConnected) document.body.appendChild(this._portal);
   }
 
   _close() {
-    if (!this._el.overlay) return;
-    this._el.overlay.classList.remove("visible");
-    this._el.scrim.classList.remove("visible");
+    if (this._portal && this._portal.isConnected) this._portal.remove();
   }
 
   _sendCommand(command) {

@@ -4,22 +4,20 @@ Custom HACS Lovelace card: a mini d-pad for Samsung TVs (core `samsungtv` integr
 
 ## Features
 
-- Gamepad icon that drops a 3x3 d-pad overlay down from the top of the screen
-- Keys: Home, Up, Close / Left, OK, Right / Back, Down, Power
-- Sends `KEY_HOME`, `KEY_UP`, `KEY_LEFT`, `KEY_ENTER`, `KEY_RIGHT`, `KEY_RETURN`, `KEY_DOWN`
-- Power toggles `media_entity` (`turn_off` when on, `turn_on` otherwise, so a SmartThings wake-up automation can handle power-on); falls back to `KEY_POWER` if no `media_entity` is set
+- Back icon (`mdi:arrow-u-left-top`) for the dashboard: tap sends `KEY_RETURN`, long-press (500 ms) drops a 3x3 d-pad overlay down from the top of the screen
+- D-pad keys: Home, Up, Menu (cog) / Left, OK, Right / Back, Down, Close
+- Sends `KEY_HOME`, `KEY_UP`, `KEY_MENU`, `KEY_LEFT`, `KEY_ENTER`, `KEY_RIGHT`, `KEY_RETURN`, `KEY_DOWN`
 - Overlay stays open between presses; Close or tapping outside dismisses it
+- Overlay is attached to the page body while open, so it covers the full width including the sidebar
 - Same iOS-style key styling as the Sky Q numpad
-- Back key uses `/local/icons/exit.svg`
 
 ## Configuration
 
 ```yaml
 type: custom:mkraftman-samsung-dpad
 entity: remote.living_room_samsung_tv
-media_entity: media_player.living_room_samsung_tv
 color: "#5E5E94"                 # optional, trigger icon colour (default #A9A9A9)
-icon: mdi:gamepad                # optional
+icon: mdi:arrow-u-left-top       # optional
 size: 90%                        # optional, % of card width or px (default 90%)
 height: clamp(45px, 9vw, 70px)   # optional, trigger height
 ```

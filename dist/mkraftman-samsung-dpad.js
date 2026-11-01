@@ -14,7 +14,8 @@ const DPAD_KEYS = [
   { key: "left", icon: "mdi:chevron-left", command: "KEY_LEFT" },
   { key: "ok", icon: "mdi:circle-medium", command: "KEY_ENTER" },
   { key: "right", icon: "mdi:chevron-right", command: "KEY_RIGHT" },
-  { key: "back", icon: "mdi:arrow-u-left-top", command: "KEY_RETURN" },
+  // Like the Samsung remote's Back key: tap = back, hold = exit
+  { key: "back", icon: "mdi:arrow-u-left-top", command: "KEY_RETURN", hold: "KEY_EXIT" },
   { key: "down", icon: "mdi:chevron-down", command: "KEY_DOWN" },
   { key: "close", icon: "mdi:keyboard-close-outline", action: "close", flip: true },
 ];
@@ -66,7 +67,8 @@ class MkraftmanSamsungDpad extends HTMLElement {
     const c = this._config;
 
     const keysHtml = DPAD_KEYS.map((k) => {
-      const attr = k.action ? `data-action="${k.action}"` : `data-command="${k.command}"`;
+      let attr = k.action ? `data-action="${k.action}"` : `data-command="${k.command}"`;
+      if (k.hold) attr += ` data-hold="${k.hold}"`;
       const inner = `<ha-icon icon="${k.icon}"${k.flip ? ' class="flip"' : ""}></ha-icon>`;
       return `<button class="dpad-key" ${attr} aria-label="${k.key}">${inner}</button>`;
     }).join("");
@@ -159,6 +161,10 @@ class MkraftmanSamsungDpad extends HTMLElement {
           justify-content: center;
           padding: 0;
           -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
+          touch-action: manipulation;
           box-shadow: 0 1px 0 rgba(0,0,0,0.3);
         }
         .dpad-key:active {
@@ -219,9 +225,37 @@ class MkraftmanSamsungDpad extends HTMLElement {
       this._close();
     });
 
-    this._el.overlay.addEventListener("click", (e) => {
+    // D-pad keys with a hold command (Back): hold sends it instead of the tap command
+    const ov = this._el.overlay;
+    const cancelKeyHold = () => {
+      clearTimeout(this._keyHoldTimer);
+      this._keyHoldTimer = null;
+    };
+    ov.addEventListener("pointerdown", (e) => {
+      const key = e.target.closest(".dpad-key[data-hold]");
+      this._keyHeld = null;
+      cancelKeyHold();
+      if (!key || (e.button !== undefined && e.button !== 0)) return;
+      this._keyHoldTimer = setTimeout(() => {
+        this._keyHoldTimer = null;
+        this._keyHeld = key;
+        this._sendCommand(key.dataset.hold);
+      }, HOLD_MS);
+    });
+    ov.addEventListener("pointerup", cancelKeyHold);
+    ov.addEventListener("pointercancel", cancelKeyHold);
+    ov.addEventListener("pointerout", (e) => {
+      if (e.target.closest && e.target.closest(".dpad-key[data-hold]")) cancelKeyHold();
+    });
+    ov.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    ov.addEventListener("click", (e) => {
       const key = e.target.closest(".dpad-key");
       if (!key) return;
+      if (this._keyHeld === key) {
+        this._keyHeld = null;
+        return;
+      }
       const command = key.dataset.command;
       const action = key.dataset.action;
       if (command) {
@@ -278,6 +312,7 @@ class MkraftmanSamsungDpad extends HTMLElement {
 
   disconnectedCallback() {
     clearTimeout(this._holdTimer);
+    clearTimeout(this._keyHoldTimer);
     if (this._resizeObserver) this._resizeObserver.disconnect();
     this._close();
   }

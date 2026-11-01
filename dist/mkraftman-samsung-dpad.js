@@ -10,7 +10,7 @@ const HOLD_MS = 500;
 const DPAD_KEYS = [
   { key: "home", icon: "mdi:home-outline", command: "KEY_HOME" },
   { key: "up", icon: "mdi:chevron-up", command: "KEY_UP" },
-  { key: "menu", icon: "mdi:cog", command: "KEY_MENU" },
+  { key: "menu", icon: "mdi:cog-outline", command: "KEY_MENU" },
   { key: "left", icon: "mdi:chevron-left", command: "KEY_LEFT" },
   { key: "ok", icon: "mdi:circle-medium", command: "KEY_ENTER" },
   { key: "right", icon: "mdi:chevron-right", command: "KEY_RIGHT" },

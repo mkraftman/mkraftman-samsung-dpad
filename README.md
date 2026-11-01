@@ -5,8 +5,8 @@ Custom HACS Lovelace card: a mini d-pad for Samsung TVs (core `samsungtv` integr
 ## Features
 
 - Back icon (`mdi:arrow-u-left-top`) for the dashboard: tap sends `KEY_RETURN`, long-press (500 ms) drops a 3x3 d-pad overlay down from the top of the screen
-- D-pad keys: Home, Up, Menu (cog) / Left, OK, Right / Back, Down, Close
-- Sends `KEY_HOME`, `KEY_UP`, `KEY_MENU`, `KEY_LEFT`, `KEY_ENTER`, `KEY_RIGHT`, `KEY_RETURN`, `KEY_DOWN`
+- D-pad keys: Home, Up, Menu (`mdi:cog-outline`) / Left, OK, Right / Back, Down, Close
+- Sends `KEY_HOME`, `KEY_UP`, `KEY_MENU`, `KEY_LEFT`, `KEY_ENTER`, `KEY_RIGHT`, `KEY_RETURN`, `KEY_DOWN`, plus `KEY_EXIT` on holding Back
 - D-pad Back key works like the Samsung remote's: tap sends `KEY_RETURN`, hold (500 ms) sends `KEY_EXIT`
 - Overlay stays open between presses; Close or tapping outside dismisses it
 - Overlay is attached to the page body while open, so it covers the full width including the sidebar

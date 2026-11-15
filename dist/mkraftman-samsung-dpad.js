@@ -1,11 +1,12 @@
 /**
  * mkraftman-samsung-dpad
  * Mini d-pad for Samsung TVs via remote.send_command.
- * Shows an exit icon: tap sends KEY_EXIT (configurable), long-press drops a 3x3 d-pad
+ * Shows an exit icon: tap sends KEY_RETURN (configurable), 1 s long-press drops a 3x3 d-pad
  * overlay down from the top.
  */
 
-const HOLD_MS = 500;
+const HOLD_MS = 500; // d-pad Back key: hold to send KEY_EXIT
+const TRIGGER_HOLD_MS = 1000; // top-bar button: hold to open the d-pad
 
 const DPAD_KEYS = [
   { key: "home", icon: "mdi:home-outline", command: "KEY_HOME" },
@@ -39,7 +40,7 @@ class MkraftmanSamsungDpad extends HTMLElement {
     if (!config.entity) throw new Error("You must specify an 'entity'");
     this._config = {
       icon: "mdi:close-box-outline",
-      tap_command: "KEY_EXIT",
+      tap_command: "KEY_RETURN",
       color: "#A9A9A9",
       size: "90%",
       height: "clamp(45px, 9vw, 70px)",
@@ -206,7 +207,7 @@ class MkraftmanSamsungDpad extends HTMLElement {
         this._holdTimer = null;
         this._held = true;
         this._open();
-      }, HOLD_MS);
+      }, TRIGGER_HOLD_MS);
     });
     t.addEventListener("pointerup", cancelHold);
     t.addEventListener("pointercancel", cancelHold);
